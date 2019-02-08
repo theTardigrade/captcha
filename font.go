@@ -13,7 +13,7 @@ import (
 
 const (
 	fontFilename     = "CutiveMono-Regular.ttf"
-	fontRelativePath = "assets/CutiveMono-Regular.ttf"
+	fontRelativePath = "assets/" + fontFilename
 )
 
 var (
