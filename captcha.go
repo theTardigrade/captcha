@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"gopkg.in/fogleman/gg.v1"
@@ -26,29 +25,29 @@ func New(opts Options) (*Captcha, error) {
 	c := Captcha{}
 	opts.SetDefaults()
 
-	var waitGroup sync.WaitGroup
+	// var waitGroup sync.WaitGroup
 
 	if opts.UseIdentifier {
-		waitGroup.Add(1)
+		// waitGroup.Add(1)
 
 		go func() {
 			c.generateIdentifier()
-			waitGroup.Done()
+			// waitGroup.Done()
 		}()
 	}
 
 	errChan := make(chan error)
 
-	waitGroup.Add(1)
+	// waitGroup.Add(1)
 
 	go func(errChan chan<- error, opts *Options) {
 		if err := c.generateImage(opts); err != nil {
 			errChan <- err
 		}
-		waitGroup.Done()
+		// waitGroup.Done()
 	}(errChan, &opts)
 
-	waitGroup.Wait()
+	// waitGroup.Wait()
 
 	select {
 	case err := <-errChan:
