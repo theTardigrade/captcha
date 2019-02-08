@@ -133,7 +133,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 		dc.RotateAbout(r, halfWidth, halfHeight)
 		dc.ScaleAbout(z, z, cx, cy)
 		dc.DrawString(s, x, y)
-		dc.ScaleAbout(-z, -z, cx, cy)
+		dc.ScaleAbout(1, 1, cx, cy)
 		dc.RotateAbout(-r, halfWidth, halfHeight)
 	}
 
