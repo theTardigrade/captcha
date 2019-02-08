@@ -2,8 +2,10 @@ package captcha
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/base64"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"strings"
 	"sync"
@@ -22,7 +24,7 @@ func init() {
 	rand.Seed(int64(time.Now().UTC().UnixNano()))
 }
 
-func New(opts Options) (*Captcha, error) {
+func New(opts Options, r *http.Request) (*Captcha, error) {
 	c := Captcha{}
 
 	var waitGroup sync.WaitGroup
@@ -30,7 +32,7 @@ func New(opts Options) (*Captcha, error) {
 	waitGroup.Add(2)
 
 	go func() {
-		c.generateIdentifier()
+		c.generateIdentifier(r)
 		waitGroup.Done()
 	}()
 
@@ -139,7 +141,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 	return nil
 }
 
-func (c *Captcha) generateIdentifier() {
+func (c *Captcha) generateIdentifier(r *http.Request) {
 	buffer := bytes.NewBuffer(nil)
 
 	for i := 0; i < 7; i++ {
@@ -152,6 +154,12 @@ func (c *Captcha) generateIdentifier() {
 	for i := 0; i < 4; i++ {
 		buffer.WriteByte('-')
 		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
+	}
+
+	buffer.WriteByte('-')
+	hashedRemoteAddr := sha256.Sum256([]byte(r.RemoteAddr))
+	for _, b := range hashedRemoteAddr {
+		buffer.WriteByte(b)
 	}
 
 	c.Identifier = buffer.String()
