@@ -43,10 +43,10 @@ func New(opts Options) (*Captcha, error) {
 
 	i := float64(rand.Intn(81)+16) * DefaultWidth / width
 	for x := float64(0); x < width; x += i {
-		a := float64(rand.Intn(49)+16) / 64 * defaultArea / area
+		a := ((float64(rand.Intn(49)+16) / 64) * defaultArea) / area
 		dc.SetRGBA(r, g, b, a)
-		r := float64(rand.Intn(41)+60) * defaultArea / area
-		y := float64(rand.Intn(21)-10)*DefaultHeight/height + halfHeight
+		r := (float64(rand.Intn(41)+60) * defaultArea) / area
+		y := (float64(rand.Intn(21)-10)*DefaultHeight)/height + halfHeight
 		dc.DrawCircle(x, y, r)
 		dc.Fill()
 	}
