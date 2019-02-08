@@ -38,7 +38,7 @@ func New(opts Options) (*Captcha, error) {
 	dc.SetRGB(1, 1, 1)
 	dc.Clear()
 
-	r, g, b := float64(opts.backgroundColor.R)/255, float64(opts.backgroundColor.G)/255, float64(opts.backgroundColor.B)/255
+	r, g, b := float64(opts.BackgroundColor.R)/255, float64(opts.BackgroundColor.G)/255, float64(opts.BackgroundColor.B)/255
 
 	for x := float64(0); x < imageWidth; x += float64(rand.Intn(81) + 16) {
 		a := float64(rand.Intn(49)+16) / 64
@@ -65,7 +65,7 @@ func New(opts Options) (*Captcha, error) {
 			s = string('1' + rand.Intn('9'-'1'+1))
 		}
 
-		c.value += s
+		c.Value += s
 
 		w, h := dc.MeasureString(s)
 		a := float64(rand.Intn(65)-32) / 384
@@ -81,7 +81,7 @@ func New(opts Options) (*Captcha, error) {
 	}
 
 	image := base64.StdEncoding.EncodeToString(buffer.Bytes())
-	c.image = "data:image/png;base64," + image
+	c.Image = "data:image/png;base64," + image
 
 	buffer.Reset()
 	for i := 0; i < 11; i++ {
@@ -89,7 +89,7 @@ func New(opts Options) (*Captcha, error) {
 		buffer.WriteByte('-')
 	}
 	buffer.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
-	c.identifier = buffer.String()
+	c.Identifier = buffer.String()
 
 	return &c, nil
 }
