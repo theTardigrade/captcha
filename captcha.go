@@ -16,14 +16,16 @@ import (
 )
 
 const (
-	characterCount = 7
-	DefaultWidth   = 800
-	DefaultHeight  = 200
+	characterCount          = 7
+	DefaultWidth            = 800
+	DefaultHeight           = 200
+	DefaultFontSize float64 = 64
 )
 
 type Options struct {
 	BackgroundColor color.RGBA
 	Width, Height   int
+	FontSize        float64
 }
 
 type Captcha struct {
@@ -47,6 +49,10 @@ func New(opts Options) (*Captcha, error) {
 		opts.Height = DefaultHeight
 	}
 
+	if opts.FontSize == 0 {
+		opts.FontSize = DefaultFontSize
+	}
+
 	dc := gg.NewContext(opts.Width, opts.Height)
 	dc.SetRGB(1, 1, 1)
 	dc.Clear()
@@ -62,7 +68,7 @@ func New(opts Options) (*Captcha, error) {
 		dc.Fill()
 	}
 
-	font, err := gg.LoadFontFace(path.Join(os.Getenv("GOPATH"), "src", reflect.TypeOf(c).PkgPath(), "assets/CutiveMono-Regular.ttf"), 128)
+	font, err := gg.LoadFontFace(path.Join(os.Getenv("GOPATH"), "src", reflect.TypeOf(c).PkgPath(), "assets/CutiveMono-Regular.ttf"), opts.FontSize)
 	if err != nil {
 		return nil, err
 	}
