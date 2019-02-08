@@ -23,12 +23,13 @@ var (
 
 func loadFont(size float64) (font font.Face, err error) {
 	prevFontMutex.RLock()
-	defer prevFontMutex.RUnlock()
 
-	if prevFont != nil && size == prevFontSize {
+	if prevFont != nil && prevFontSize == size {
 		font = prevFont
+		prevFontMutex.RUnlock()
 		return
 	}
+	prevFontMutex.RUnlock()
 
 	font, err = gg.LoadFontFace(fontPath(), size)
 	if err == nil {
