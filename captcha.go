@@ -16,16 +16,17 @@ import (
 )
 
 const (
-	characterCount          = 7
-	DefaultWidth            = 800
-	DefaultHeight           = 200
-	DefaultFontSize float64 = 64
+	DefaultWidth                  = 800
+	DefaultHeight                 = 200
+	DefaultFontSize       float64 = 64
+	DefaultCharacterCount         = 7
 )
 
 type Options struct {
 	BackgroundColor color.RGBA
 	Width, Height   int
 	FontSize        float64
+	CharacterCount  int
 }
 
 type Captcha struct {
@@ -53,6 +54,10 @@ func New(opts Options) (*Captcha, error) {
 		opts.FontSize = DefaultFontSize
 	}
 
+	if opts.CharacterCount == 0 {
+		opts.CharacterCount = DefaultCharacterCount
+	}
+
 	dc := gg.NewContext(opts.Width, opts.Height)
 	dc.SetRGB(1, 1, 1)
 	dc.Clear()
@@ -75,7 +80,7 @@ func New(opts Options) (*Captcha, error) {
 	dc.SetFontFace(font)
 	dc.SetRGBA(1, 1, 1, 1)
 
-	for i := 0; i < characterCount; i++ {
+	for i, l := 0, opts.CharacterCount; i < l; i++ {
 		var s string
 
 		if rand.Float64() < float64(1)/3 {
@@ -89,7 +94,7 @@ func New(opts Options) (*Captcha, error) {
 		w, h := dc.MeasureString(s)
 		a := float64(rand.Intn(65)-32) / 384
 		dc.RotateAbout(a, float64(opts.Width)/2, float64(opts.Height)/2)
-		dc.DrawString(s, float64(opts.Width)/float64(characterCount)*(float64(i)+0.5)-w/2, float64(opts.Height)/2+h/4)
+		dc.DrawString(s, float64(opts.Width)/float64(opts.CharacterCount)*(float64(i)+0.5)-w/2, float64(opts.Height)/2+h/4)
 		dc.RotateAbout(-a, float64(opts.Width)/2, float64(opts.Height)/2)
 	}
 
