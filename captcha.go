@@ -124,6 +124,13 @@ func (c *Captcha) generateImage(opts *Options) error {
 		dc.RotateAbout(-r, halfWidth, halfHeight)
 	}
 
+	dc.SetRGBA255(255, 0, 0, 128)
+	for x := float64(0); x < width; x += rand.Float64()*16 + 1 {
+		for y := float64(0); y < height; y += rand.Float64()*16 + 1 {
+			dc.SetPixel(int(x), int(y))
+		}
+	}
+
 	err = dc.EncodePNG(buffer)
 	if err != nil {
 		return err
