@@ -30,6 +30,7 @@ func New(opts Options) (*Captcha, error) {
 
 	if opts.UseIdentifier {
 		waitGroup.Add(1)
+
 		go func() {
 			c.generateIdentifier()
 			waitGroup.Done()
@@ -39,6 +40,7 @@ func New(opts Options) (*Captcha, error) {
 	errChan := make(chan error)
 
 	waitGroup.Add(1)
+
 	go func(errChan chan<- error, opts *Options) {
 		if err := c.generateImage(opts); err != nil {
 			errChan <- err
