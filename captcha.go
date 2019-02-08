@@ -23,6 +23,9 @@ var (
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
 		'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 	}
+	numbers = [...]byte{
+		'1', '2', '3', '4', '5', '6', '7', '8', '9',
+	}
 )
 
 func init() {
@@ -119,11 +122,12 @@ func (c *Captcha) generateImage(opts *Options) error {
 	for i := 0; i < characterCount; i++ {
 		var s string
 
-		if f := rand.Float64(); f < 0.5 {
+		if f := rand.Float64(); f <= float64(1)/3 {
 			i := rand.Intn(len(letters))
 			s = string(letters[i])
 		} else {
-			s = string('1' + rand.Intn('9'-'1'+1))
+			i := rand.Intn(len(numbers))
+			s = string(numbers[i])
 		}
 
 		c.Value += s
