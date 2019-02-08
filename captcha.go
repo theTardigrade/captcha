@@ -92,8 +92,12 @@ func New(opts Options) (*Captcha, error) {
 		return nil, err
 	}
 
-	image := base64.StdEncoding.EncodeToString(buffer.Bytes())
-	c.Image = "data:image/png;base64," + image
+	{
+		imageBuffer := bytes.NewBuffer(nil)
+		imageBuffer.WriteString("data:image/png;base64,")
+		imageBuffer.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
+		c.Image = imageBuffer.String()
+	}
 
 	buffer.Reset()
 	for i := 0; i < 11; i++ {
