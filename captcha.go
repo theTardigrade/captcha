@@ -3,7 +3,6 @@ package captcha
 import (
 	"bytes"
 	"encoding/base64"
-	"image/color"
 	"math/rand"
 	"os"
 	"path"
@@ -14,20 +13,6 @@ import (
 
 	"gopkg.in/fogleman/gg.v1"
 )
-
-const (
-	DefaultWidth                  = 800
-	DefaultHeight                 = 200
-	DefaultFontSize       float64 = 64
-	DefaultCharacterCount         = 7
-)
-
-type Options struct {
-	BackgroundColor color.RGBA
-	Width, Height   int
-	FontSize        float64
-	CharacterCount  int
-}
 
 type Captcha struct {
 	Image      string
@@ -42,45 +27,37 @@ func init() {
 func New(opts Options) (*Captcha, error) {
 	c := Captcha{}
 
-	if opts.Width == 0 {
-		opts.Width = DefaultWidth
-	}
+	opts.SetDefaults()
 
-	if opts.Height == 0 {
-		opts.Height = DefaultHeight
-	}
-
-	if opts.FontSize == 0 {
-		opts.FontSize = DefaultFontSize
-	}
-
-	if opts.CharacterCount == 0 {
-		opts.CharacterCount = DefaultCharacterCount
-	}
+	width := float64(opts.Width)
+	height := float64(opts.Height)
+	backgroundColor := opts.BackgroundColor
+	fontSize := opts.FontSize
+	characterCount := opts.CharacterCount
 
 	dc := gg.NewContext(opts.Width, opts.Height)
 	dc.SetRGB(1, 1, 1)
 	dc.Clear()
 
-	r, g, b := float64(opts.BackgroundColor.R)/255, float64(opts.BackgroundColor.G)/255, float64(opts.BackgroundColor.B)/255
+	r, g, b := float64(backgroundColor.R)/255, float64(backgroundColor.G)/255, float64(backgroundColor.B)/255
 
-	for x := float64(0); x < float64(opts.Width); x += float64(rand.Intn(81) + 16) {
+	for x := float64(0); x < width; x += float64(rand.Intn(81) + 16) {
 		a := float64(rand.Intn(49)+16) / 64
 		dc.SetRGBA(r, g, b, a)
 		r := float64(rand.Intn(41) + 60)
-		y := float64(rand.Intn(21)-10) + float64(opts.Height)/2
+		y := float64(rand.Intn(21)-10) + height/2
 		dc.DrawCircle(x, y, r)
 		dc.Fill()
 	}
 
-	font, err := gg.LoadFontFace(path.Join(os.Getenv("GOPATH"), "src", reflect.TypeOf(c).PkgPath(), "assets/CutiveMono-Regular.ttf"), opts.FontSize)
+	font, err := gg.LoadFontFace(path.Join(os.Getenv("GOPATH"), "src", reflect.TypeOf(c).PkgPath(), "assets/CutiveMono-Regular.ttf"), fontSize)
 	if err != nil {
 		return nil, err
 	}
 	dc.SetFontFace(font)
 	dc.SetRGBA(1, 1, 1, 1)
 
-	for i, l := 0, opts.CharacterCount; i < l; i++ {
+	for i := 0; i < characterCount; i++ {
 		var s string
 
 		if rand.Float64() < float64(1)/3 {
@@ -93,9 +70,9 @@ func New(opts Options) (*Captcha, error) {
 
 		w, h := dc.MeasureString(s)
 		a := float64(rand.Intn(65)-32) / 384
-		dc.RotateAbout(a, float64(opts.Width)/2, float64(opts.Height)/2)
-		dc.DrawString(s, float64(opts.Width)/float64(opts.CharacterCount)*(float64(i)+0.5)-w/2, float64(opts.Height)/2+h/4)
-		dc.RotateAbout(-a, float64(opts.Width)/2, float64(opts.Height)/2)
+		dc.RotateAbout(a, width/2, height/2)
+		dc.DrawString(s, width/float64(characterCount)*(float64(i)+0.5)-w/2, height/2+h/4)
+		dc.RotateAbout(-a, width/2, height/2)
 	}
 
 	buffer := bytes.NewBuffer(nil)
