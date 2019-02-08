@@ -102,7 +102,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 		return err
 	}
 	dc.SetFontFace(font)
-	dc.SetRGBA(float64(textColor.R), float64(textColor.G), float64(textColor.B), 0.75)
+	dc.SetRGBA(float64(textColor.R)/255, float64(textColor.G)/255, float64(textColor.B)/255, 0.75)
 
 	for i := 0; i < characterCount; i++ {
 		var s string
