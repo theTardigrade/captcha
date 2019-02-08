@@ -47,8 +47,8 @@ func fontPath() string {
 }
 
 func packagePath() string {
-	s := struct{}{}
-	return reflect.TypeOf(s).PkgPath()
+	c := Captcha{}
+	return reflect.TypeOf(c).PkgPath()
 }
 
 func goPath() string {
