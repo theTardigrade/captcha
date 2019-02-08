@@ -114,7 +114,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 
 		c.Value += s
 
-		alpha := 255 - rand.Intn(33)
+		alpha := 255 - rand.Intn(65)
 		dc.SetRGBA255(int(textColor.R), int(textColor.G), int(textColor.B), alpha)
 
 		w, h := dc.MeasureString(s)
