@@ -7,7 +7,7 @@ const (
 	DefaultHeight                   = 200
 	DefaultFontSize         float64 = 64
 	DefaultCharacterCount           = 7
-	DefaultLetterProportion float64 = 0.7
+	DefaultLetterProportion float64 = 0.5
 
 	defaultArea = DefaultWidth * DefaultHeight
 )
