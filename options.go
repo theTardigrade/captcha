@@ -25,6 +25,7 @@ type Options struct {
 	Width, Height   int
 	FontSize        float64
 	CharacterCount  int
+	UseIdentifier   bool
 }
 
 func (o *Options) SetDefaults() {

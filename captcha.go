@@ -24,20 +24,21 @@ func init() {
 
 func New(opts Options) (*Captcha, error) {
 	c := Captcha{}
+	opts.SetDefaults()
 
 	var waitGroup sync.WaitGroup
 
-	waitGroup.Add(2)
-
-	go func() {
-		c.generateIdentifier()
-		waitGroup.Done()
-	}()
+	if opts.UseIdentifier {
+		waitGroup.Add(1)
+		go func() {
+			c.generateIdentifier()
+			waitGroup.Done()
+		}()
+	}
 
 	errChan := make(chan error)
 
 	go func(errChan chan<- error, opts *Options) {
-		opts.SetDefaults()
 		if err := c.generateImage(opts); err != nil {
 			errChan <- err
 		}
