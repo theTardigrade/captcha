@@ -9,6 +9,7 @@ import (
 	"path"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"gopkg.in/fogleman/gg.v1"
@@ -95,4 +96,8 @@ func New(opts Options) (*Captcha, error) {
 	c.Identifier = buffer.String()
 
 	return &c, nil
+}
+
+func (c *Captcha) CheckValue(value string) bool {
+	return strings.ToUpper(value) == c.Value
 }
