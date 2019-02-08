@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"image/color"
 	"math/rand"
+	"os"
 	"path"
 	"reflect"
 	"strconv"
@@ -51,7 +52,7 @@ func New(opts Options) (*Captcha, error) {
 		dc.Fill()
 	}
 
-	font, err := gg.LoadFontFace(path.Join(reflect.TypeOf(c).PkgPath(), "assets/CutiveMono-Regular.ttf"), 128)
+	font, err := gg.LoadFontFace(path.Join(os.Getenv("GOPATH"), "src", reflect.TypeOf(c).PkgPath(), "assets/CutiveMono-Regular.ttf"), 128)
 	if err != nil {
 		return nil, err
 	}
