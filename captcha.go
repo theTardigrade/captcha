@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"gopkg.in/fogleman/gg.v1"
@@ -15,7 +16,6 @@ type Captcha struct {
 	Image      string
 	Value      string
 	Identifier string
-	buffer     *bytes.Buffer
 }
 
 func init() {
@@ -23,12 +23,40 @@ func init() {
 }
 
 func New(opts Options) (*Captcha, error) {
-	c := Captcha{
-		buffer: bytes.NewBuffer(nil),
+	c := Captcha{}
+
+	var waitGroup sync.WaitGroup
+
+	waitGroup.Add(2)
+
+	go func() {
+		c.generateIdentifier()
+		waitGroup.Done()
+	}()
+
+	errChan := make(chan error)
+
+	go func(errChan chan<- error, opts *Options) {
+		opts.SetDefaults()
+		if err := c.generateImage(opts); err != nil {
+			errChan <- err
+		}
+		waitGroup.Done()
+	}(errChan, &opts)
+
+	select {
+	case err := <-errChan:
+		return nil, err
+	default:
+		return &c, nil
 	}
+}
 
-	opts.SetDefaults()
+func (c *Captcha) CheckValue(value string) bool {
+	return strings.ToUpper(value) == c.Value
+}
 
+func (c *Captcha) generateImage(opts *Options) error {
 	width := float64(opts.Width)
 	height := float64(opts.Height)
 	area := width * height
@@ -37,6 +65,7 @@ func New(opts Options) (*Captcha, error) {
 	backgroundColor := opts.BackgroundColor
 	fontSize := opts.FontSize
 	characterCount := opts.CharacterCount
+	buffer := bytes.NewBuffer(nil)
 
 	dc := gg.NewContext(opts.Width, opts.Height)
 
@@ -66,7 +95,7 @@ func New(opts Options) (*Captcha, error) {
 
 	font, err := loadFont(fontSize)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	dc.SetFontFace(font)
 	dc.SetRGBA(1, 1, 1, 1)
@@ -89,31 +118,23 @@ func New(opts Options) (*Captcha, error) {
 		dc.RotateAbout(-a, halfWidth, halfHeight)
 	}
 
-	err = dc.EncodePNG(c.buffer)
+	err = dc.EncodePNG(buffer)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	{
 		imageBuffer := bytes.NewBuffer(nil)
 		imageBuffer.WriteString("data:image/png;base64,")
-		imageBuffer.WriteString(base64.StdEncoding.EncodeToString(c.buffer.Bytes()))
+		imageBuffer.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
 		c.Image = imageBuffer.String()
 	}
 
-	c.generateIdentifier()
-
-	return &c, nil
-}
-
-func (c *Captcha) CheckValue(value string) bool {
-	return strings.ToUpper(value) == c.Value
+	return nil
 }
 
 func (c *Captcha) generateIdentifier() {
-	buffer := c.buffer
-
-	buffer.Reset()
+	buffer := bytes.NewBuffer(nil)
 
 	for i := 0; i < 7; i++ {
 		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
