@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
+	"math"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -144,23 +145,29 @@ func (c *Captcha) generateImage(opts *Options) error {
 func (c *Captcha) generateIdentifier(r *http.Request) {
 	buffer := bytes.NewBuffer(nil)
 
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 5; i++ {
 		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
 		buffer.WriteByte('-')
 	}
 
 	buffer.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 2; i++ {
 		buffer.WriteByte('-')
 		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
 	}
 
 	buffer.WriteByte('-')
 	hashedRemoteAddr := sha256.Sum256([]byte(r.RemoteAddr))
-	for _, b := range hashedRemoteAddr {
-		buffer.WriteByte(b)
+	var hashedRemoteAddrValue uint64
+	l := len(hashedRemoteAddr)
+	if l > 20 {
+		l = 20
 	}
+	for i := 0; i < l; i++ {
+		hashedRemoteAddrValue += uint64(hashedRemoteAddr[i]) + uint64(math.Pow(255, float64(i)))
+	}
+	buffer.WriteString(strconv.FormatUint(hashedRemoteAddrValue, 36))
 
 	c.Identifier = buffer.String()
 }
