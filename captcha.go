@@ -145,7 +145,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 func (c *Captcha) generateIdentifier(r *http.Request) {
 	buffer := bytes.NewBuffer(nil)
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 3; i++ {
 		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
 		buffer.WriteByte('-')
 	}
@@ -168,6 +168,11 @@ func (c *Captcha) generateIdentifier(r *http.Request) {
 		hashedRemoteAddrValue += uint64(hashedRemoteAddr[i]) + uint64(math.Pow(255, float64(i)))
 	}
 	buffer.WriteString(strconv.FormatUint(hashedRemoteAddrValue, 36))
+
+	for i := 0; i < 3; i++ {
+		buffer.WriteByte('-')
+		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
+	}
 
 	c.Identifier = buffer.String()
 }
