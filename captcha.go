@@ -44,6 +44,8 @@ func New(opts Options) (*Captcha, error) {
 		waitGroup.Done()
 	}(errChan, &opts)
 
+	waitGroup.Wait()
+
 	select {
 	case err := <-errChan:
 		return nil, err
