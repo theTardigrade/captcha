@@ -82,8 +82,8 @@ func (c *Captcha) generateImage(opts *Options) error {
 			dc.Clear()
 
 			for x := float64(0); x < width; x += float64(rand.Intn(int(width/5)+1)) + width/80 {
-				a := float64(rand.Intn(49)+16) / 64
-				dc.SetRGBA(r, g, b, a)
+				alpha := int(float64(rand.Intn(49)+16) / 64)
+				dc.SetRGBA255(int(backgroundColor.R), int(backgroundColor.G), int(backgroundColor.B), alpha)
 				r := float64(rand.Intn(int(area/1e3)+1)) + area/600
 				y := (float64(rand.Intn(21)-10)*DefaultHeight)/height + halfHeight
 				dc.DrawCircle(x, y, r)
@@ -102,7 +102,6 @@ func (c *Captcha) generateImage(opts *Options) error {
 		return err
 	}
 	dc.SetFontFace(font)
-	dc.SetRGBA(float64(textColor.R)/255, float64(textColor.G)/255, float64(textColor.B)/255, 0.75)
 
 	for i := 0; i < characterCount; i++ {
 		var s string
@@ -115,11 +114,14 @@ func (c *Captcha) generateImage(opts *Options) error {
 
 		c.Value += s
 
+		alpha := 255 - rand.Intn(32)
+		dc.SetRGBA255(int(textColor.R), int(textColor.G), int(textColor.B), alpha)
+
 		w, h := dc.MeasureString(s)
-		a := float64(rand.Intn(65)-32) / 384
-		dc.RotateAbout(a, halfWidth, halfHeight)
+		r := float64(rand.Intn(65)-32) / 384
+		dc.RotateAbout(r, halfWidth, halfHeight)
 		dc.DrawString(s, width/float64(characterCount)*(float64(i)+0.5)-w/2, halfHeight+h/4)
-		dc.RotateAbout(-a, halfWidth, halfHeight)
+		dc.RotateAbout(-r, halfWidth, halfHeight)
 	}
 
 	err = dc.EncodePNG(buffer)
