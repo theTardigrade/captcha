@@ -3,8 +3,11 @@ package captcha
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"image/color"
 	"math/rand"
+	"path"
+	"runtime"
 	"strconv"
 	"time"
 
@@ -49,7 +52,12 @@ func New(opts Options) (*Captcha, error) {
 		dc.Fill()
 	}
 
-	font, err := gg.LoadFontFace("assets/CutiveMono-Regular.ttf", 128)
+	_, filename, _, ok := runtime.Caller(1)
+	if !ok {
+		return nil, errors.New("Cannot access runtime")
+	}
+
+	font, err := gg.LoadFontFace(path.Join(path.Dir(filename), "assets/CutiveMono-Regular.ttf"), 128)
 	if err != nil {
 		return nil, err
 	}
