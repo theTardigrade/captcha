@@ -7,6 +7,8 @@ const (
 	DefaultHeight                 = 200
 	DefaultFontSize       float64 = 64
 	DefaultCharacterCount         = 7
+
+	defaultArea = DefaultWidth * DefaultHeight
 )
 
 type Options struct {

@@ -28,6 +28,7 @@ func New(opts Options) (*Captcha, error) {
 
 	width := float64(opts.Width)
 	height := float64(opts.Height)
+	area := width * height
 	halfWidth := width / 2
 	halfHeight := height / 2
 	backgroundColor := opts.BackgroundColor
@@ -40,11 +41,12 @@ func New(opts Options) (*Captcha, error) {
 
 	r, g, b := float64(backgroundColor.R)/255, float64(backgroundColor.G)/255, float64(backgroundColor.B)/255
 
-	for x := float64(0); x < width; x += float64(rand.Intn(81) + 16) {
-		a := float64(rand.Intn(49)+16) / 64
+	i := float64(rand.Intn(81)+16) * DefaultWidth / width
+	for x := float64(0); x < width; x += i {
+		a := float64(rand.Intn(49)+16) / 64 * defaultArea / area
 		dc.SetRGBA(r, g, b, a)
-		r := float64(rand.Intn(41) + 60)
-		y := float64(rand.Intn(21)-10) + halfHeight
+		r := float64(rand.Intn(41)+60) * defaultArea / area
+		y := float64(rand.Intn(21)-10)*DefaultHeight/height + halfHeight
 		dc.DrawCircle(x, y, r)
 		dc.Fill()
 	}
