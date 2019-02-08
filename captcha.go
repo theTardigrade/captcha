@@ -145,11 +145,8 @@ func (c *Captcha) generateImage(opts *Options) error {
 func (c *Captcha) generateIdentifier(r *http.Request) {
 	buffer := bytes.NewBuffer(nil)
 
-	for i := 0; i < 3; i++ {
-		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
-		buffer.WriteByte('-')
-	}
-
+	buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
+	buffer.WriteByte('-')
 	buffer.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
 
 	for i := 0; i < 2; i++ {
