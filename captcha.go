@@ -18,6 +18,13 @@ type Captcha struct {
 	Identifier string
 }
 
+var (
+	letters = []byte{
+		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
+		'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+	}
+)
+
 func init() {
 	rand.Seed(int64(time.Now().UTC().UnixNano()))
 }
@@ -112,8 +119,9 @@ func (c *Captcha) generateImage(opts *Options) error {
 	for i := 0; i < characterCount; i++ {
 		var s string
 
-		if rand.Float64() < float64(1)/3 {
-			s = string('A' + rand.Intn('H'-'A'+1))
+		if f := rand.Float64(); f < 0.5 {
+			i := rand.Intn(len(letters))
+			s = string(letters[i])
 		} else {
 			s = string('1' + rand.Intn('9'-'1'+1))
 		}
