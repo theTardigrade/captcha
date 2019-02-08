@@ -24,7 +24,7 @@ func init() {
 	rand.Seed(int64(time.Now().UTC().UnixNano()))
 }
 
-func New(opts Options, r *http.Request) (*Captcha, error) {
+func New(r *http.Request, opts Options) (*Captcha, error) {
 	c := Captcha{}
 
 	var waitGroup sync.WaitGroup
