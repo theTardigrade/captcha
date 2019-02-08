@@ -128,7 +128,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 		y := halfHeight + h/4
 		cx, cy := x+w/2, y+h/2
 		r := float64(rand.Intn(65)-32) / 384
-		z := rand.Float64()/8 + 15/float64(16)
+		z := rand.Float64()/16 + 15/float64(32)
 
 		dc.RotateAbout(r, halfWidth, halfHeight)
 		dc.ScaleAbout(z, z, cx, cy)
