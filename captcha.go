@@ -15,6 +15,7 @@ type Captcha struct {
 	Image      string
 	Value      string
 	Identifier string
+	buffer     *bytes.Buffer
 }
 
 func init() {
@@ -22,7 +23,9 @@ func init() {
 }
 
 func New(opts Options) (*Captcha, error) {
-	c := Captcha{}
+	c := Captcha{
+		buffer: bytes.NewBuffer(nil),
+	}
 
 	opts.SetDefaults()
 
@@ -86,8 +89,7 @@ func New(opts Options) (*Captcha, error) {
 		dc.RotateAbout(-a, halfWidth, halfHeight)
 	}
 
-	buffer := bytes.NewBuffer(nil)
-	err = dc.EncodePNG(buffer)
+	err = dc.EncodePNG(c.buffer)
 	if err != nil {
 		return nil, err
 	}
@@ -95,27 +97,37 @@ func New(opts Options) (*Captcha, error) {
 	{
 		imageBuffer := bytes.NewBuffer(nil)
 		imageBuffer.WriteString("data:image/png;base64,")
-		imageBuffer.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
+		imageBuffer.WriteString(base64.StdEncoding.EncodeToString(c.buffer.Bytes()))
 		c.Image = imageBuffer.String()
 	}
 
-	buffer.Reset()
-	for i := 0; i < 7; i++ {
-		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
-		buffer.WriteByte('-')
-	}
-	buffer.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
-	for i := 0; i < 4; i++ {
-		buffer.WriteByte('-')
-		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
-	}
-	c.Identifier = buffer.String()
+	c.generateIdentifier()
 
 	return &c, nil
 }
 
 func (c *Captcha) CheckValue(value string) bool {
 	return strings.ToUpper(value) == c.Value
+}
+
+func (c *Captcha) generateIdentifier() {
+	buffer := c.buffer
+
+	buffer.Reset()
+
+	for i := 0; i < 7; i++ {
+		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
+		buffer.WriteByte('-')
+	}
+
+	buffer.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
+
+	for i := 0; i < 4; i++ {
+		buffer.WriteByte('-')
+		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
+	}
+
+	c.Identifier = buffer.String()
 }
 
 func CheckValues(expectedValue, receivedValue string) bool {
