@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"encoding/base64"
 	"math/rand"
-	"os"
-	"path"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -31,6 +28,8 @@ func New(opts Options) (*Captcha, error) {
 
 	width := float64(opts.Width)
 	height := float64(opts.Height)
+	halfWidth := width / 2
+	halfHeight := height / 2
 	backgroundColor := opts.BackgroundColor
 	fontSize := opts.FontSize
 	characterCount := opts.CharacterCount
@@ -45,12 +44,12 @@ func New(opts Options) (*Captcha, error) {
 		a := float64(rand.Intn(49)+16) / 64
 		dc.SetRGBA(r, g, b, a)
 		r := float64(rand.Intn(41) + 60)
-		y := float64(rand.Intn(21)-10) + height/2
+		y := float64(rand.Intn(21)-10) + halfHeight
 		dc.DrawCircle(x, y, r)
 		dc.Fill()
 	}
 
-	font, err := gg.LoadFontFace(path.Join(os.Getenv("GOPATH"), "src", reflect.TypeOf(c).PkgPath(), "assets/CutiveMono-Regular.ttf"), fontSize)
+	font, err := loadFont(fontSize)
 	if err != nil {
 		return nil, err
 	}
@@ -70,9 +69,9 @@ func New(opts Options) (*Captcha, error) {
 
 		w, h := dc.MeasureString(s)
 		a := float64(rand.Intn(65)-32) / 384
-		dc.RotateAbout(a, width/2, height/2)
-		dc.DrawString(s, width/float64(characterCount)*(float64(i)+0.5)-w/2, height/2+h/4)
-		dc.RotateAbout(-a, width/2, height/2)
+		dc.RotateAbout(a, halfWidth, halfHeight)
+		dc.DrawString(s, width/float64(characterCount)*(float64(i)+0.5)-w/2, halfHeight+h/4)
+		dc.RotateAbout(-a, halfWidth, halfHeight)
 	}
 
 	buffer := bytes.NewBuffer(nil)
