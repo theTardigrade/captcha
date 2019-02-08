@@ -17,12 +17,13 @@ import (
 
 const (
 	characterCount = 7
-	imageWidth     = 800
-	imageHeight    = 200
+	DefaultWidth   = 800
+	DefaultHeight  = 200
 )
 
 type Options struct {
 	BackgroundColor color.RGBA
+	Width, Height   int
 }
 
 type Captcha struct {
@@ -38,17 +39,25 @@ func init() {
 func New(opts Options) (*Captcha, error) {
 	c := Captcha{}
 
-	dc := gg.NewContext(imageWidth, imageHeight)
+	if opts.Width == 0 {
+		opts.Width = DefaultWidth
+	}
+
+	if opts.Height == 0 {
+		opts.Height = DefaultHeight
+	}
+
+	dc := gg.NewContext(opts.Width, opts.Height)
 	dc.SetRGB(1, 1, 1)
 	dc.Clear()
 
 	r, g, b := float64(opts.BackgroundColor.R)/255, float64(opts.BackgroundColor.G)/255, float64(opts.BackgroundColor.B)/255
 
-	for x := float64(0); x < imageWidth; x += float64(rand.Intn(81) + 16) {
+	for x := float64(0); x < float64(opts.Width); x += float64(rand.Intn(81) + 16) {
 		a := float64(rand.Intn(49)+16) / 64
 		dc.SetRGBA(r, g, b, a)
 		r := float64(rand.Intn(41) + 60)
-		y := float64(rand.Intn(21)-10) + imageHeight/2
+		y := float64(rand.Intn(21)-10) + float64(opts.Height)/2
 		dc.DrawCircle(x, y, r)
 		dc.Fill()
 	}
@@ -73,9 +82,9 @@ func New(opts Options) (*Captcha, error) {
 
 		w, h := dc.MeasureString(s)
 		a := float64(rand.Intn(65)-32) / 384
-		dc.RotateAbout(a, imageWidth/2, imageHeight/2)
-		dc.DrawString(s, float64(imageWidth)/float64(characterCount)*(float64(i)+0.5)-w/2, float64(imageHeight)/2+h/4)
-		dc.RotateAbout(-a, imageWidth/2, imageHeight/2)
+		dc.RotateAbout(a, float64(opts.Width)/2, float64(opts.Height)/2)
+		dc.DrawString(s, float64(opts.Width)/float64(characterCount)*(float64(i)+0.5)-w/2, float64(opts.Height)/2+h/4)
+		dc.RotateAbout(-a, float64(opts.Width)/2, float64(opts.Height)/2)
 	}
 
 	buffer := bytes.NewBuffer(nil)
