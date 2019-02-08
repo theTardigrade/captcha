@@ -2,11 +2,8 @@ package captcha
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/base64"
-	"math"
 	"math/rand"
-	"net/http"
 	"strconv"
 	"strings"
 	"sync"
@@ -25,7 +22,7 @@ func init() {
 	rand.Seed(int64(time.Now().UTC().UnixNano()))
 }
 
-func New(r *http.Request, opts Options) (*Captcha, error) {
+func New(opts Options) (*Captcha, error) {
 	c := Captcha{}
 
 	var waitGroup sync.WaitGroup
@@ -33,7 +30,7 @@ func New(r *http.Request, opts Options) (*Captcha, error) {
 	waitGroup.Add(2)
 
 	go func() {
-		c.generateIdentifier(r)
+		c.generateIdentifier()
 		waitGroup.Done()
 	}()
 
@@ -142,31 +139,17 @@ func (c *Captcha) generateImage(opts *Options) error {
 	return nil
 }
 
-func (c *Captcha) generateIdentifier(r *http.Request) {
+func (c *Captcha) generateIdentifier() {
 	buffer := bytes.NewBuffer(nil)
 
-	buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
-	buffer.WriteByte('-')
+	for i := 0; i < 4; i++ {
+		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
+		buffer.WriteByte('-')
+	}
+
 	buffer.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
 
-	for i := 0; i < 2; i++ {
-		buffer.WriteByte('-')
-		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
-	}
-
-	buffer.WriteByte('-')
-	hashedRemoteAddr := sha256.Sum256([]byte(r.RemoteAddr))
-	var hashedRemoteAddrValue uint64
-	l := len(hashedRemoteAddr)
-	if l > 20 {
-		l = 20
-	}
-	for i := 0; i < l; i++ {
-		hashedRemoteAddrValue += uint64(hashedRemoteAddr[i]) + uint64(math.Pow(255, float64(i)))
-	}
-	buffer.WriteString(strconv.FormatUint(hashedRemoteAddrValue, 36))
-
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 5; i++ {
 		buffer.WriteByte('-')
 		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
 	}
