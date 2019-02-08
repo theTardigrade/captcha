@@ -82,7 +82,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 			dc.Clear()
 
 			for x := float64(0); x < width; x += float64(rand.Intn(int(width/5)+1)) + width/80 {
-				alpha := int(float64(rand.Intn(49)+16) / 64)
+				alpha := 255 - rand.Intn(129)
 				dc.SetRGBA255(int(backgroundColor.R), int(backgroundColor.G), int(backgroundColor.B), alpha)
 				r := float64(rand.Intn(int(area/1e3)+1)) + area/600
 				y := (float64(rand.Intn(21)-10)*DefaultHeight)/height + halfHeight
@@ -114,7 +114,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 
 		c.Value += s
 
-		alpha := 255 - rand.Intn(32)
+		alpha := 255 - rand.Intn(33)
 		dc.SetRGBA255(int(textColor.R), int(textColor.G), int(textColor.B), alpha)
 
 		w, h := dc.MeasureString(s)
