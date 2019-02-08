@@ -11,8 +11,16 @@ const (
 	defaultArea = DefaultWidth * DefaultHeight
 )
 
+type backgroundType uint8
+
+const (
+	BackgroundFillType backgroundType = iota
+	BackgroundCirclesType
+)
+
 type Options struct {
 	BackgroundColor color.RGBA
+	BackgroundType  backgroundType
 	Width, Height   int
 	FontSize        float64
 	CharacterCount  int
