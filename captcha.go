@@ -44,7 +44,7 @@ func New(opts Options) (*Captcha, error) {
 	for x := float64(0); x < width; x += float64(rand.Intn(int(width/11))) + width/40 {
 		a := float64(rand.Intn(49)+16) / 64
 		dc.SetRGBA(r, g, b, a)
-		r := float64(rand.Intn(int(area/1e3)+1)) + area/1250
+		r := float64(rand.Intn(int(area/1e3)+1)) + area/500
 		y := (float64(rand.Intn(21)-10)*DefaultHeight)/height + halfHeight
 		dc.DrawCircle(x, y, r)
 		dc.Fill()
