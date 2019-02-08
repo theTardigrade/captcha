@@ -122,7 +122,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 	for i := 0; i < characterCount; i++ {
 		var s string
 
-		if f := rand.Float64(); f <= float64(1)/3 {
+		if f := rand.Float64(); f < 0.35 {
 			i := rand.Intn(len(letters))
 			s = string(letters[i])
 		} else {
