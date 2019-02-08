@@ -42,7 +42,7 @@ func New(opts Options) (*Captcha, error) {
 	r, g, b := float64(backgroundColor.R)/255, float64(backgroundColor.G)/255, float64(backgroundColor.B)/255
 
 	for x := float64(0); x < width; x += float64(rand.Intn(int(width/11))) + width/40 {
-		a := ((float64(rand.Intn(49)+16) / 64) * defaultArea) / area
+		a := float64(rand.Intn(int(area/1e3)+1)) + area/2500
 		dc.SetRGBA(r, g, b, a)
 		r := (float64(rand.Intn(41)+60) * defaultArea) / area
 		y := (float64(rand.Intn(21)-10)*DefaultHeight)/height + halfHeight
