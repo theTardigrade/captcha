@@ -18,13 +18,13 @@ const (
 )
 
 type Options struct {
-	backgroundColor color.RGBA
+	BackgroundColor color.RGBA
 }
 
 type Captcha struct {
-	image      string
-	value      string
-	identifier string
+	Image      string
+	Value      string
+	Identifier string
 }
 
 func init() {
