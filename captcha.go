@@ -121,10 +121,12 @@ func (c *Captcha) generateImage(opts *Options) error {
 		dc.SetRGBA255(int(textColor.R), int(textColor.G), int(textColor.B), alpha)
 
 		w, h := dc.MeasureString(s)
+		x := width/float64(characterCount)*(float64(i)+0.5) - w/2
+		y := halfHeight + h/4
 		r := float64(rand.Intn(65)-32) / 384
 
 		dc.RotateAbout(r, halfWidth, halfHeight)
-		dc.DrawString(s, width/float64(characterCount)*(float64(i)+0.5)-w/2, halfHeight+h/4)
+		dc.DrawString(s, x, y)
 		dc.RotateAbout(-r, halfWidth, halfHeight)
 	}
 
