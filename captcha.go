@@ -105,6 +105,10 @@ func New(opts Options) (*Captcha, error) {
 		buffer.WriteByte('-')
 	}
 	buffer.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
+	for i := 0; i < 4; i++ {
+		buffer.WriteByte('-')
+		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
+	}
 	c.Identifier = buffer.String()
 
 	return &c, nil
