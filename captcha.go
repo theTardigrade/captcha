@@ -65,8 +65,10 @@ func (c *Captcha) generateImage(opts *Options) error {
 	halfWidth := width / 2
 	halfHeight := height / 2
 	backgroundColor := opts.BackgroundColor
+	textColor := opts.TextColor
 	fontSize := opts.FontSize
 	characterCount := opts.CharacterCount
+
 	buffer := bytes.NewBuffer(nil)
 
 	dc := gg.NewContext(opts.Width, opts.Height)
@@ -100,7 +102,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 		return err
 	}
 	dc.SetFontFace(font)
-	dc.SetRGBA(1, 1, 1, 1)
+	dc.SetRGBA(float64(textColor.R), float64(textColor.G), float64(textColor.B), float64(textColor.A))
 
 	for i := 0; i < characterCount; i++ {
 		var s string
