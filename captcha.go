@@ -85,8 +85,6 @@ func (c *Captcha) generateImage(opts *Options) error {
 	fontSize := opts.FontSize
 	characterCount := opts.CharacterCount
 
-	buffer := bytes.NewBuffer(nil)
-
 	dc := gg.NewContext(opts.Width, opts.Height)
 
 	r, g, b := float64(backgroundColor.R)/255, float64(backgroundColor.G)/255, float64(backgroundColor.B)/255
@@ -145,37 +143,42 @@ func (c *Captcha) generateImage(opts *Options) error {
 		dc.RotateAbout(-r, halfWidth, halfHeight)
 	}
 
+	buffer := bytes.NewBuffer(nil)
 	err = dc.EncodePNG(buffer)
 	if err != nil {
 		return err
 	}
 
 	{
-		imageBuffer := bytes.NewBuffer(nil)
-		imageBuffer.WriteString("data:image/png;base64,")
-		imageBuffer.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
-		c.Image = imageBuffer.String()
+		var imageBuilder strings.Builder
+
+		imageBuilder.WriteString("data:image/png;base64,")
+		imageBuilder.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
+
+		c.Image = imageBuilder.String()
 	}
 
 	return nil
 }
 
 func (c *Captcha) generateIdentifier() {
-	buffer := bytes.NewBuffer(nil)
+	var builder strings.Builder
+
+	builder.Grow(160)
 
 	for i := 0; i < 4; i++ {
-		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
-		buffer.WriteByte('-')
+		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
+		builder.WriteByte('-')
 	}
 
-	buffer.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
+	builder.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
 
 	for i := 0; i < 5; i++ {
-		buffer.WriteByte('-')
-		buffer.WriteString(strconv.FormatInt(rand.Int63(), 36))
+		builder.WriteByte('-')
+		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
 	}
 
-	c.Identifier = buffer.String()
+	c.Identifier = builder.String()
 }
 
 func CheckValues(expectedValue, receivedValue string) bool {
