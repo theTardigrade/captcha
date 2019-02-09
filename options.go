@@ -27,6 +27,7 @@ type Options struct {
 	FontSize         float64
 	CharacterCount   int
 	UseIdentifier    bool
+	UseConcurrency   bool
 	LetterProportion float64
 }
 

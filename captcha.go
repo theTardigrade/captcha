@@ -33,9 +33,24 @@ func init() {
 	rand.Seed(int64(time.Now().UTC().UnixNano()))
 }
 
+type newBody func(*Options) (*Captcha, error)
+
 func New(opts Options) (*Captcha, error) {
-	c := Captcha{}
 	opts.SetDefaults()
+
+	var body newBody
+
+	if opts.UseConcurrency {
+		body = newConcurrentBody
+	} else {
+		body = newSequentialBody
+	}
+
+	return body(&opts)
+}
+
+func newConcurrentBody(opts *Options) (*Captcha, error) {
+	c := Captcha{}
 
 	var waitGroup sync.WaitGroup
 
@@ -53,12 +68,12 @@ func New(opts Options) (*Captcha, error) {
 	{
 		waitGroup.Add(1)
 
-		go func(errChan chan<- error, opts *Options) {
+		go func(errChan chan<- error) {
 			if err := c.generateImage(opts); err != nil {
 				errChan <- err
 			}
 			waitGroup.Done()
-		}(errChan, &opts)
+		}(errChan)
 	}
 
 	waitGroup.Wait()
@@ -69,6 +84,20 @@ func New(opts Options) (*Captcha, error) {
 	default:
 		return &c, nil
 	}
+}
+
+func newSequentialBody(opts *Options) (*Captcha, error) {
+	c := Captcha{}
+
+	if opts.UseIdentifier {
+		c.generateIdentifier()
+	}
+
+	if err := c.generateImage(opts); err != nil {
+		return nil, err
+	}
+
+	return &c, nil
 }
 
 func (c *Captcha) CheckValue(value string) bool {
