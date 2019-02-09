@@ -69,7 +69,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 	}
 	dc.SetFontFace(font)
 
-	var valueBuilder strings.Builder
+	var builder strings.Builder
 
 	for i := 0; i < characterCount; i++ {
 		var b byte
@@ -82,7 +82,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 			b = numbers[i]
 		}
 
-		valueBuilder.WriteByte(b)
+		builder.WriteByte(b)
 
 		alpha := 255 - rand.Intn(65)
 		dc.SetRGBA255(int(textColor.R), int(textColor.G), int(textColor.B), alpha)
@@ -98,7 +98,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 		dc.RotateAbout(-r, halfWidth, halfHeight)
 	}
 
-	c.Value = valueBuilder.String()
+	c.Value = builder.String()
 
 	buffer := bytes.NewBuffer(nil)
 	err = dc.EncodePNG(buffer)
@@ -106,14 +106,12 @@ func (c *Captcha) generateImage(opts *Options) error {
 		return err
 	}
 
-	{
-		var imageURLBuilder strings.Builder
+	builder.Reset()
 
-		imageURLBuilder.WriteString("data:image/png;base64,")
-		imageURLBuilder.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
+	builder.WriteString("data:image/png;base64,")
+	builder.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
 
-		c.ImageURL = template.URL(imageURLBuilder.String())
-	}
+	c.ImageURL = template.URL(builder.String())
 
 	return nil
 }
