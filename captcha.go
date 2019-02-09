@@ -13,7 +13,7 @@ import (
 )
 
 type Captcha struct {
-	Image      string
+	ImageURL   string
 	Value      string
 	Identifier string
 }
@@ -150,12 +150,12 @@ func (c *Captcha) generateImage(opts *Options) error {
 	}
 
 	{
-		var imageBuilder strings.Builder
+		var imageURLBuilder strings.Builder
 
-		imageBuilder.WriteString("data:image/png;base64,")
-		imageBuilder.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
+		imageURLBuilder.WriteString("data:image/png;base64,")
+		imageURLBuilder.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
 
-		c.Image = imageBuilder.String()
+		c.ImageURL = imageURLBuilder.String()
 	}
 
 	return nil
