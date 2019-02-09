@@ -119,7 +119,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 func (c *Captcha) generateIdentifier() {
 	var builder strings.Builder
 
-	builder.Grow(160)
+	builder.Grow(139)
 
 	for i := 0; i < 4; i++ {
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
