@@ -116,19 +116,32 @@ func (c *Captcha) generateImage(opts *Options) error {
 	return nil
 }
 
+const (
+	identifierSegmentMaxLength = 13
+	identifierSegmentCount     = 10
+	identifierSeparator        = '-'
+	identifierSeparatorLength  = 1
+	identifierMaxLength        = identifierSegmentMaxLength*identifierSegmentCount + identifierSeparatorLength*(identifierSegmentCount-1)
+)
+
 func (c *Captcha) generateIdentifier() {
 	var builder strings.Builder
 
 	builder.Grow(139)
 
-	for i := 0; i < 4; i++ {
+	l := identifierSegmentCount / 2
+	if identifierSegmentCount%2 == 0 {
+		l--
+	}
+
+	for i := 0; i < l; i++ {
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
 		builder.WriteByte('-')
 	}
 
 	builder.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
 
-	for i := 0; i < 5; i++ {
+	for i, l := 0, identifierSegmentMaxLength/2; i < l; i++ {
 		builder.WriteByte('-')
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
 	}
