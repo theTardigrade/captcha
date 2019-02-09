@@ -20,7 +20,13 @@ var (
 	prevFontSize  float64
 	prevFont      font.Face
 	prevFontMutex sync.RWMutex
+
+	fontPath string
 )
+
+func init() {
+	fontPath = generateFontPath()
+}
 
 func loadFont(size float64) (font font.Face, err error) {
 	prevFontMutex.RLock()
@@ -30,7 +36,7 @@ func loadFont(size float64) (font font.Face, err error) {
 	prevFontMutex.RUnlock()
 
 	if font == nil {
-		font, err = gg.LoadFontFace(fontPath(), size)
+		font, err = gg.LoadFontFace(fontPath, size)
 		if err == nil {
 			prevFontMutex.Lock()
 			prevFont = font
@@ -41,7 +47,7 @@ func loadFont(size float64) (font font.Face, err error) {
 	return
 }
 
-func fontPath() string {
+func generateFontPath() string {
 	return path.Join(goPath(), "src", packagePath(), fontRelativePath)
 }
 
