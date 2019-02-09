@@ -47,7 +47,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 			dc.SetRGB(1, 1, 1)
 			dc.Clear()
 
-			for x, l := float64(0), width*1.25; x < l; x += float64(rand.Intn(int(width/5)+1)) + width/80 {
+			for x, l := float64(0)-width*0.125, width*1.25; x < l; x += float64(rand.Intn(int(width/5)+1)) + width/80 {
 				alpha := 255 - rand.Intn(129)
 				dc.SetRGBA255(int(backgroundColor.R), int(backgroundColor.G), int(backgroundColor.B), alpha)
 				r := float64(rand.Intn(int(area/1e3)+1)) + area/600
