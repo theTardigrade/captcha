@@ -3,6 +3,7 @@ package captcha
 import (
 	"bytes"
 	"encoding/base64"
+	"html/template"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -13,7 +14,7 @@ import (
 )
 
 type Captcha struct {
-	ImageURL   string
+	ImageURL   template.URL
 	Value      string
 	Identifier string
 }
@@ -155,7 +156,7 @@ func (c *Captcha) generateImage(opts *Options) error {
 		imageURLBuilder.WriteString("data:image/png;base64,")
 		imageURLBuilder.WriteString(base64.StdEncoding.EncodeToString(buffer.Bytes()))
 
-		c.ImageURL = imageURLBuilder.String()
+		c.ImageURL = template.URL(imageURLBuilder.String())
 	}
 
 	return nil
