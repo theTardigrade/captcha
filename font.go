@@ -24,19 +24,18 @@ var (
 
 func loadFont(size float64) (font font.Face, err error) {
 	prevFontMutex.RLock()
-
 	if prevFont != nil && prevFontSize == size {
 		font = prevFont
-		prevFontMutex.RUnlock()
-		return
 	}
 	prevFontMutex.RUnlock()
 
-	font, err = gg.LoadFontFace(fontPath(), size)
-	if err == nil {
-		prevFontMutex.Lock()
-		prevFont = font
-		prevFontMutex.Unlock()
+	if font == nil {
+		font, err = gg.LoadFontFace(fontPath(), size)
+		if err == nil {
+			prevFontMutex.Lock()
+			prevFont = font
+			prevFontMutex.Unlock()
+		}
 	}
 
 	return
