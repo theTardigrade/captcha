@@ -119,9 +119,8 @@ func (c *Captcha) generateImage(opts *Options) error {
 const (
 	identifierSegmentMaxLength = 13
 	identifierSegmentCount     = 10
-	identifierSeparator        = '-'
-	identifierSeparatorLength  = 1
-	identifierMaxLength        = identifierSegmentMaxLength*identifierSegmentCount + identifierSeparatorLength*(identifierSegmentCount-1)
+	identifierSeparatorByte    = '-'
+	identifierMaxLength        = identifierSegmentMaxLength*identifierSegmentCount + (identifierSegmentCount - 1)
 )
 
 func (c *Captcha) generateIdentifier() {
@@ -136,13 +135,13 @@ func (c *Captcha) generateIdentifier() {
 
 	for i := 0; i < l; i++ {
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
-		builder.WriteByte('-')
+		builder.WriteByte(identifierSeparatorByte)
 	}
 
 	builder.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
 
 	for i, l := 0, identifierSegmentMaxLength/2; i < l; i++ {
-		builder.WriteByte('-')
+		builder.WriteByte(identifierSeparatorByte)
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
 	}
 
