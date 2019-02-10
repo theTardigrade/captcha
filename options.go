@@ -12,10 +12,10 @@ const (
 	defaultArea = DefaultWidth * DefaultHeight
 )
 
-type backgroundType uint8
+type BackgroundType uint8
 
 const (
-	BackgroundFillType backgroundType = iota
+	BackgroundFillType BackgroundType = iota
 	BackgroundCirclesType
 )
 
