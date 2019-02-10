@@ -22,7 +22,7 @@ const (
 type Options struct {
 	BackgroundColor  color.RGBA
 	TextColor        color.RGBA
-	BackgroundType   backgroundType
+	BackgroundType   BackgroundType
 	Width, Height    int
 	FontSize         float64
 	CharacterCount   int
