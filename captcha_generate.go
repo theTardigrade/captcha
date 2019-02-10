@@ -126,12 +126,9 @@ const (
 func (c *Captcha) generateIdentifier() {
 	var builder strings.Builder
 
-	builder.Grow(139)
+	builder.Grow(identifierMaxLength)
 
 	l := identifierSegmentCount / 2
-	if identifierSegmentCount%2 == 0 {
-		l--
-	}
 
 	for i := 0; i < l; i++ {
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
@@ -140,7 +137,11 @@ func (c *Captcha) generateIdentifier() {
 
 	builder.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
 
-	for i, l := 0, identifierSegmentMaxLength/2; i < l; i++ {
+	if identifierSegmentCount%2 == 0 {
+		l--
+	}
+
+	for i := 0; i < l; i++ {
 		builder.WriteByte(identifierSeparatorByte)
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
 	}
