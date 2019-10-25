@@ -122,7 +122,7 @@ const (
 	identifierSegmentMaxLength = 13
 	identifierSegmentCount     = 7
 	identifierSeparatorByte    = '-'
-	identifierMaxLength        = identifierSegmentMaxLength*identifierSegmentCount // + (identifierSegmentCount - 1)
+	identifierMaxLength        = identifierSegmentMaxLength*identifierSegmentCount + (identifierSegmentCount - 1)
 )
 
 func seed() (n int64) {
@@ -150,7 +150,7 @@ func (c *Captcha) generateIdentifier() {
 
 	for i := 0; i < l; i++ {
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
-		//	builder.WriteByte(identifierSeparatorByte)
+		builder.WriteByte(identifierSeparatorByte)
 	}
 
 	builder.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
@@ -160,7 +160,7 @@ func (c *Captcha) generateIdentifier() {
 	}
 
 	for i := 0; i < l; i++ {
-		//	builder.WriteByte(identifierSeparatorByte)
+		builder.WriteByte(identifierSeparatorByte)
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
 	}
 
