@@ -57,5 +57,15 @@ func packagePath() string {
 }
 
 func goPath() string {
-	return os.Getenv("GOPATH")
+	value := os.Getenv("GOPATH")
+
+	if value == "" {
+		bin := os.Getenv("GOBIN")
+
+		if bin != "" {
+			value = path.Join(bin, "..")
+		}
+	}
+
+	return value
 }

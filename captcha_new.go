@@ -29,8 +29,8 @@ func newConcurrentBody(opts *Options) (*Captcha, error) {
 		waitGroup.Add(1)
 
 		go func() {
+			defer waitGroup.Done()
 			c.generateIdentifier()
-			waitGroup.Done()
 		}()
 	}
 
@@ -40,10 +40,10 @@ func newConcurrentBody(opts *Options) (*Captcha, error) {
 		waitGroup.Add(1)
 
 		go func(errChan chan<- error) {
+			defer waitGroup.Done()
 			if err := c.generateImage(opts); err != nil {
 				errChan <- err
 			}
-			waitGroup.Done()
 		}(errChan)
 	}
 

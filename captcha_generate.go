@@ -2,7 +2,9 @@ package captcha
 
 import (
 	"bytes"
+	cryptoRand "crypto/rand"
 	"encoding/base64"
+	"encoding/binary"
 	"html/template"
 	"math/rand"
 	"strconv"
@@ -118,10 +120,26 @@ func (c *Captcha) generateImage(opts *Options) error {
 
 const (
 	identifierSegmentMaxLength = 13
-	identifierSegmentCount     = 10
+	identifierSegmentCount     = 7
 	identifierSeparatorByte    = '-'
-	identifierMaxLength        = identifierSegmentMaxLength*identifierSegmentCount + (identifierSegmentCount - 1)
+	identifierMaxLength        = identifierSegmentMaxLength*identifierSegmentCount // + (identifierSegmentCount - 1)
 )
+
+func seed() (n int64) {
+	var seedBytes [8]byte
+
+	if _, err := cryptoRand.Read(seedBytes[:]); err == nil {
+		n = int64(binary.LittleEndian.Uint64(seedBytes[:]))
+	} else {
+		n = time.Now().UTC().UnixNano()
+	}
+
+	return
+}
+
+func init() {
+	rand.Seed(seed())
+}
 
 func (c *Captcha) generateIdentifier() {
 	var builder strings.Builder
@@ -132,7 +150,7 @@ func (c *Captcha) generateIdentifier() {
 
 	for i := 0; i < l; i++ {
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
-		builder.WriteByte(identifierSeparatorByte)
+		//	builder.WriteByte(identifierSeparatorByte)
 	}
 
 	builder.WriteString(strconv.FormatInt(int64(time.Now().UTC().UnixNano()), 36))
@@ -142,7 +160,7 @@ func (c *Captcha) generateIdentifier() {
 	}
 
 	for i := 0; i < l; i++ {
-		builder.WriteByte(identifierSeparatorByte)
+		//	builder.WriteByte(identifierSeparatorByte)
 		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
 	}
 
