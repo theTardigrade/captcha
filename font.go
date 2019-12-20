@@ -67,5 +67,9 @@ func goPath() string {
 		}
 	}
 
+	if value == "" {
+		panic("cannot load GOPATH")
+	}
+
 	return value
 }
