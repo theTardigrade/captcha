@@ -2,21 +2,14 @@ package captcha
 
 import (
 	"bytes"
-	cryptoRand "crypto/rand"
 	"encoding/base64"
-	"encoding/binary"
 	"html/template"
-	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 
 	"gopkg.in/fogleman/gg.v1"
 )
-
-func init() {
-	rand.Seed(int64(time.Now().UTC().UnixNano()))
-}
 
 var (
 	letters = [...]byte{
@@ -49,11 +42,11 @@ func (c *Captcha) generateImage(opts *Options) error {
 			dc.SetRGB(1, 1, 1)
 			dc.Clear()
 
-			for x, l := float64(0)-width*0.125, width*1.25; x < l; x += float64(rand.Intn(int(width/5)+1)) + width/80 {
-				alpha := 255 - rand.Intn(129)
+			for x, l := float64(0)-width*0.125, width*1.25; x < l; x += float64(c.random.Intn(int(width/5)+1)) + width/80 {
+				alpha := 255 - c.random.Intn(129)
 				dc.SetRGBA255(int(backgroundColor.R), int(backgroundColor.G), int(backgroundColor.B), alpha)
-				r := float64(rand.Intn(int(area/1e3)+1)) + area/600
-				y := (float64(rand.Intn(21)-10)*DefaultHeight)/height + halfHeight
+				r := float64(c.random.Intn(int(area/1e3)+1)) + area/600
+				y := (float64(c.random.Intn(21)-10)*DefaultHeight)/height + halfHeight
 				dc.DrawCircle(x, y, r)
 				dc.Fill()
 			}
@@ -76,24 +69,24 @@ func (c *Captcha) generateImage(opts *Options) error {
 	for i := 0; i < characterCount; i++ {
 		var b byte
 
-		if f := rand.Float64(); f <= opts.LetterProportion {
-			i := rand.Intn(len(letters))
+		if f := c.random.Float64(); f <= opts.LetterProportion {
+			i := c.random.Intn(len(letters))
 			b = letters[i]
 		} else {
-			i := rand.Intn(len(numbers))
+			i := c.random.Intn(len(numbers))
 			b = numbers[i]
 		}
 
 		builder.WriteByte(b)
 
-		alpha := 255 - rand.Intn(65)
+		alpha := 255 - c.random.Intn(65)
 		dc.SetRGBA255(int(textColor.R), int(textColor.G), int(textColor.B), alpha)
 
 		s := string(b)
 		w, h := dc.MeasureString(s)
 		x := width/float64(characterCount)*(float64(i)+0.5) - w/2
 		y := halfHeight + h/4
-		r := float64(rand.Intn(65)-32) / 384
+		r := float64(c.random.Intn(65)-32) / 384
 
 		dc.RotateAbout(r, halfWidth, halfHeight)
 		dc.DrawString(s, x, y)
@@ -125,22 +118,6 @@ const (
 	identifierMaxLength        = identifierSegmentMaxLength*identifierSegmentCount + (identifierSegmentCount - 1)
 )
 
-func seed() (n int64) {
-	var seedBytes [8]byte
-
-	if _, err := cryptoRand.Read(seedBytes[:]); err == nil {
-		n = int64(binary.LittleEndian.Uint64(seedBytes[:]))
-	} else {
-		n = time.Now().UTC().UnixNano()
-	}
-
-	return
-}
-
-func init() {
-	rand.Seed(seed())
-}
-
 func (c *Captcha) generateIdentifier() {
 	var builder strings.Builder
 
@@ -149,7 +126,7 @@ func (c *Captcha) generateIdentifier() {
 	l := identifierSegmentCount / 2
 
 	for i := 0; i < l; i++ {
-		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
+		builder.WriteString(strconv.FormatInt(c.random.Int63(), 36))
 		builder.WriteByte(identifierSeparatorByte)
 	}
 
@@ -161,7 +138,7 @@ func (c *Captcha) generateIdentifier() {
 
 	for i := 0; i < l; i++ {
 		builder.WriteByte(identifierSeparatorByte)
-		builder.WriteString(strconv.FormatInt(rand.Int63(), 36))
+		builder.WriteString(strconv.FormatInt(c.random.Int63(), 36))
 	}
 
 	c.Identifier = builder.String()
